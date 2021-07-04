@@ -5,64 +5,49 @@ import TaskList from '../task-list/task-list';
 import Footer from '../footer/footer';
 import './todo-app.css';
 
-
 export default class ToDoApp extends Component {
-
   state = {
-    data: [
-      this.createTask('Completed task'),
-      this.createTask('Editing task'),
-      this.createTask('Active task'),
-    ],
-    filter: 'All'
+    data: [this.createTask('Completed task'), this.createTask('Editing task'), this.createTask('Active task')],
+    filter: 'All',
   };
 
   deleteTask = (id) => {
     this.setState(({ data }) => {
       const i = data.findIndex((el) => el.id === id);
 
-      const newData = [
-        ...data.slice(0, i),
-        ...data.slice(i + 1)
-      ];
+      const newData = [...data.slice(0, i), ...data.slice(i + 1)];
 
       return {
-        data: newData
+        data: newData,
       };
-    })
-    console.log("Какашка");
+    });
   };
 
   addTask = (task) => {
-    const newTask = this.createTask(task)
+    const newTask = this.createTask(task);
 
-    this.setState(({ data })=>{
-      const newData = [...data, newTask]
+    this.setState(({ data }) => {
+      const newData = [...data, newTask];
 
       return {
-        data: newData
+        data: newData,
       };
     });
   };
 
   editTask = (task, id) => {
-
     this.setState(({ data }) => {
       const i = data.findIndex((el) => el.id === id);
 
       const oldTask = data[i];
-      const edittingTask = {...oldTask, description: task}
+      const edittingTask = { ...oldTask, description: task };
 
-      const newData = [
-        ...data.slice(0, i),
-        edittingTask,
-        ...data.slice(i + 1)
-      ];
+      const newData = [...data.slice(0, i), edittingTask, ...data.slice(i + 1)];
 
       return {
-        data: newData
+        data: newData,
       };
-    })
+    });
   };
 
   onToggleCompleted = (id) => {
@@ -70,31 +55,27 @@ export default class ToDoApp extends Component {
       const i = data.findIndex((el) => el.id === id);
 
       const oldTask = data[i];
-      const newTask = {...oldTask, completed: !oldTask.completed};
+      const newTask = { ...oldTask, completed: !oldTask.completed };
 
-      const newData = [
-        ...data.slice(0, i),
-        newTask,
-        ...data.slice(i + 1)
-      ];
+      const newData = [...data.slice(0, i), newTask, ...data.slice(i + 1)];
 
       return {
-        data: newData
+        data: newData,
       };
     });
   };
 
   clearCompleted = () => {
-      this.setState(({data}) => {
-        const newData = data.filter((el) => !el.completed)
-        return {
-          data: newData
-        }
-      });
+    this.setState(({ data }) => {
+      const newData = data.filter((el) => !el.completed);
+      return {
+        data: newData,
+      };
+    });
   };
 
   onFilterChange = (filter) => {
-      this.setState({filter})
+    this.setState({ filter });
   };
 
   createTask(task) {
@@ -102,12 +83,12 @@ export default class ToDoApp extends Component {
       description: task,
       createdTime: new Date(),
       completed: false,
-      id: nanoid(3)
+      id: nanoid(3),
     };
-  };
+  }
 
   filter(tasks, filter) {
-    switch(filter) {
+    switch (filter) {
       case 'All':
         return tasks;
       case 'Active':
@@ -117,10 +98,9 @@ export default class ToDoApp extends Component {
       default:
         return tasks;
     }
-  };
+  }
 
   render() {
-
     const { data, filter } = this.state;
 
     const visibleTasks = this.filter(data, filter);
@@ -132,17 +112,19 @@ export default class ToDoApp extends Component {
         <Header onAdded={this.addTask} />
         <section className="main">
           <TaskList
-            todos = { visibleTasks }
-            onDeleted={ this.deleteTask}
-            onToggleCompleted={ this.onToggleCompleted }
-            onEdit={ this.editTask } />
+            todos={visibleTasks}
+            onDeleted={this.deleteTask}
+            onToggleCompleted={this.onToggleCompleted}
+            onEdit={this.editTask}
+          />
           <Footer
-            leftTask={ leftTaskCount }
-            onClear={ this.clearCompleted }
+            leftTask={leftTaskCount}
+            onClear={this.clearCompleted}
             filter={filter}
-            onFilterChange={this.onFilterChange}/>
+            onFilterChange={this.onFilterChange}
+          />
         </section>
       </section>
     );
-  };
-};
+  }
+}
