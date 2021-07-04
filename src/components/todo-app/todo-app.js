@@ -30,6 +30,7 @@ export default class ToDoApp extends Component {
         data: newData
       };
     })
+    console.log("Какашка");
   };
 
   addTask = (task) => {
