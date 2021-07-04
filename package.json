@@ -21,7 +21,8 @@
     "eject": "react-scripts eject",
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix --color",
-    "format": "prettier --write ./src"
+    "format": "prettier --write ./src",
+    "pre-commit": "lint-staged"
   },
   "eslintConfig": {
     "extends": [
@@ -57,7 +58,7 @@
 
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "npm run pre-commit"
     }
   },
 
