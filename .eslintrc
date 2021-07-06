@@ -5,6 +5,11 @@
       "eslint-config-prettier",
       "prettier"
     ],
+    "parserOptions": {
+      "ecmaFeatures": {
+        "jsx": true
+      }
+    },
     "plugins": ["react"],
     "parser": "babel-eslint",
     "env": {
@@ -26,8 +31,7 @@
       }],
       "react/state-in-constructor": ["off"],
       "react/jsx-props-no-spreading": ["off"],
-      "react/static-property-placement": "off",
-      "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }]
+      "react/static-property-placement": "off"
     },
     "settings": {
       "react": {
