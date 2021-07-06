@@ -33,7 +33,7 @@ TaskList.propTypes = {
   todos: PropTypes.arrayOf(
     PropTypes.shape({
       description: PropTypes.string,
-      createdTime: PropTypes.string,
+      createdTime: PropTypes.instanceOf(Date),
       completed: PropTypes.bool,
       id: PropTypes.string,
     })

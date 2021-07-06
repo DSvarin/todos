@@ -26,7 +26,12 @@ export default class TaskForm extends Component {
     event.preventDefault();
     const { onAdded } = this.props;
     const { task } = this.state;
-    onAdded(task);
+    if (task.trim().length > 0) {
+      onAdded(task);
+    } else if (task.trim().length === 0) {
+      // eslint-disable-next-line no-alert
+      alert('Empty task cannot be created!');
+    }
     this.setState({
       task: '',
     });

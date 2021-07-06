@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 
 export default class TaskEditingForm extends Component {
   state = {
-    task: '',
+    // eslint-disable-next-line react/destructuring-assignment
+    task: this.props.task,
   };
 
   static defaultProps = {
@@ -21,9 +22,9 @@ export default class TaskEditingForm extends Component {
 
   onFieldChange = (event) => {
     const newTask = event.target.value;
-    const { task: oldTask } = this.props;
+
     this.setState({
-      task: oldTask + newTask.charAt(0).toUpperCase() + newTask.slice(1),
+      task: newTask.charAt(0).toUpperCase() + newTask.slice(1),
     });
   };
 
@@ -33,7 +34,9 @@ export default class TaskEditingForm extends Component {
     const { onEdit, onEditSubmit, id } = this.props;
     const { task } = this.state;
 
-    onEdit(task, id);
+    if (task.trim().length > 0) {
+      onEdit(task, id);
+    }
     onEditSubmit();
   };
 

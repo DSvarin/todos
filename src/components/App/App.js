@@ -3,9 +3,9 @@ import { nanoid } from 'nanoid';
 import Header from '../header/header';
 import TaskList from '../task-list/task-list';
 import Footer from '../footer/footer';
-import './todo-app.css';
+import './App.css';
 
-export default class ToDoApp extends Component {
+export default class App extends Component {
   state = {
     data: [this.createTask('Completed task'), this.createTask('Editing task'), this.createTask('Active task')],
     filter: 'All',
