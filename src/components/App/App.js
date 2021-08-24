@@ -35,12 +35,12 @@ export default class App extends Component {
     });
   };
 
-  editTask = (task, id) => {
+  editTask = (key, value, id) => {
     this.setState(({ data }) => {
       const i = data.findIndex((el) => el.id === id);
 
       const oldTask = data[i];
-      const edittingTask = { ...oldTask, description: task };
+      const edittingTask = { ...oldTask, [key]: value };
 
       const newData = [...data.slice(0, i), edittingTask, ...data.slice(i + 1)];
 
@@ -84,6 +84,7 @@ export default class App extends Component {
       createdTime: new Date(),
       completed: false,
       id: nanoid(3),
+      timer: 0,
     };
   }
 

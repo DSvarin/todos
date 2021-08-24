@@ -35,7 +35,7 @@ export default class TaskEditingForm extends Component {
     const { task } = this.state;
 
     if (task.trim().length > 0) {
-      onEdit(task, id);
+      onEdit('description', task, id);
     }
     onEditSubmit();
   };
