@@ -1,5 +1,5 @@
 /* eslint-disable react/destructuring-assignment */
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import PropTypes from 'prop-types';
 
@@ -7,61 +7,58 @@ import TaskEditingForm from '../task-editing-form/task-editing-form';
 
 import './task.css';
 
-export default class Task extends Component {
-  state = {
-    editing: false,
-    timerId: null,
-    timer: this.props.timer,
+const Task = ({ description, createdTime, onDeleted, onToggleCompleted, completed, id, onEdit, timer }) => {
+  const [editing, setEditing] = useState(false);
+  const [time, setTime] = useState(timer);
+  const [isPlaying, setPlayPause] = useState(false);
+
+  useEffect(() => {
+    let timerId = null;
+
+    if (isPlaying) {
+      timerId = setInterval(() => {
+        setTime((oldTime) => oldTime + 1);
+        onEdit('timer', time, id);
+      }, 1000);
+    }
+
+    if (!isPlaying || completed) {
+      clearInterval(timerId);
+    }
+    return () => clearInterval(timerId);
+  }, [isPlaying, completed, timer, time, onEdit, id]);
+
+  const onButtonEditClick = () => {
+    setEditing(true);
   };
 
-  static defaultProps = {
-    description: '',
-    createdTime: '27.02.2000',
-    onDeleted: () => {},
-    onToggleCompleted: () => {},
-    completed: false,
-    onEdit: () => {},
-    timer: 0,
+  const onEditSubmit = () => {
+    setEditing(false);
   };
 
-  static propTypes = {
-    description: PropTypes.string,
-    createdTime: PropTypes.instanceOf(Date),
-    onDeleted: PropTypes.func,
-    onToggleCompleted: PropTypes.func,
-    completed: PropTypes.bool,
-    id: PropTypes.string.isRequired,
-    onEdit: PropTypes.func,
-    timer: PropTypes.number,
+  const onPlayClick = () => {
+    setPlayPause(true);
   };
 
-  componentWillUnmount() {
-    this.onPauseClick();
-  }
-
-  onButtonEditClick = () => {
-    this.setState({
-      editing: true,
-    });
+  const onPauseClick = () => {
+    setPlayPause(false);
   };
 
-  onEditSubmit = () => {
-    const { editing } = this.state;
-    this.setState({
-      editing: !editing,
-    });
+  const onCompletedClick = () => {
+    onToggleCompleted();
+    onPauseClick();
   };
 
-  getTime = (timer) => {
+  const getTime = (currentTime) => {
     let content;
-    const time = new Date(timer * 1000);
-    const seconds = <>{time.getSeconds()}s</>;
-    const minutes = <>{time.getMinutes()}m</>;
-    const hours = <>{time.getHours()}h</>;
-    if (timer < 60) content = <>{seconds}</>;
-    if (timer >= 60 && timer < 3600) {
+    const timeMs = new Date(currentTime * 1000);
+    const seconds = <>{timeMs.getSeconds()}s</>;
+    const minutes = <>{timeMs.getMinutes()}m</>;
+    const hours = <>{timeMs.getHours()}h</>;
+    if (currentTime < 60) content = <>{seconds}</>;
+    if (currentTime >= 60 && currentTime < 3600) {
       content =
-        timer === 60 ? (
+        currentTime === 60 ? (
           <>{minutes}</>
         ) : (
           <>
@@ -69,9 +66,9 @@ export default class Task extends Component {
           </>
         );
     }
-    if (timer >= 3600 && timer < 86399) {
+    if (currentTime >= 3600 && currentTime < 86399) {
       content =
-        timer >= 3600 && timer < 3659 ? (
+        currentTime >= 3600 && currentTime < 3659 ? (
           <>
             {hours} {seconds}
           </>
@@ -84,63 +81,57 @@ export default class Task extends Component {
     return content;
   };
 
-  onCompletedClick = () => {
-    const { onToggleCompleted } = this.props;
-    onToggleCompleted();
-    this.onPauseClick();
-  };
+  const getTimeDistance = (creationTime) =>
+    formatDistanceToNow(creationTime, { includeSeconds: true, addSuffix: true });
 
-  onPlayClick = () => {
-    const { id, onEdit } = this.props;
-    if (!this.state.timerId) {
-      const timerId = setInterval(() => {
-        const oldTimer = this.state.timer;
-        const newTimer = oldTimer + 1;
-        this.setState({ timer: newTimer });
-        onEdit('timer', newTimer, id);
-      }, 1000);
-      this.setState({ timerId });
-    }
-  };
+  let liClass = '';
+  if (completed) liClass = 'completed';
+  if (editing) liClass = 'editing';
 
-  onPauseClick = () => {
-    const { timerId } = this.state;
-    clearInterval(timerId);
-    this.setState({ timerId: null });
-  };
+  const buttonEditClass = completed ? 'icon icon-edit hidden' : 'icon icon-edit';
+  const buttonPlayClass = completed ? 'icon icon-play hidden' : 'icon icon-play';
+  const buttonPauseClass = completed ? 'icon icon-pause hidden' : 'icon icon-pause';
 
-  getTimeDistance = (createdTime) => formatDistanceToNow(createdTime, { includeSeconds: true, addSuffix: true });
+  return (
+    <li className={liClass}>
+      <div className="view">
+        <input className="toggle" type="checkbox" checked={completed} onClick={onCompletedClick} readOnly />
+        <label>
+          <span className="title">{description}</span>
+          <span className="description timer">
+            <button type="button" aria-label="Play task" className={buttonPlayClass} onClick={onPlayClick} />
+            <button type="button" aria-label="Pause task" className={buttonPauseClass} onClick={onPauseClick} />
+            <span className="timer-time">{getTime(time)}</span>
+          </span>
+          <span className="description">created {getTimeDistance(createdTime)}</span>
+        </label>
+        <button type="button" aria-label="Edit task" className={buttonEditClass} onClick={onButtonEditClick} />
+        <button type="button" aria-label="Delete task" className="icon icon-destroy" onClick={onDeleted} />
+      </div>
+      <TaskEditingForm task={description} id={id} onEdit={onEdit} onEditSubmit={onEditSubmit} />
+    </li>
+  );
+};
 
-  render() {
-    const { description, createdTime, onDeleted, completed, id, onEdit } = this.props;
-    const { editing, timer } = this.state;
+export default Task;
 
-    let liClass = '';
-    if (completed) liClass = 'completed';
-    if (editing) liClass = 'editing';
+Task.defaultProps = {
+  description: '',
+  createdTime: '27.02.2000',
+  onDeleted: () => {},
+  onToggleCompleted: () => {},
+  completed: false,
+  onEdit: () => {},
+  timer: 0,
+};
 
-    const buttonEditClass = completed ? 'icon icon-edit hidden' : 'icon icon-edit';
-    const buttonPlayClass = completed ? 'icon icon-play hidden' : 'icon icon-play';
-    const buttonPauseClass = completed ? 'icon icon-pause hidden' : 'icon icon-pause';
-
-    return (
-      <li className={liClass}>
-        <div className="view">
-          <input className="toggle" type="checkbox" checked={completed} onClick={this.onCompletedClick} readOnly />
-          <label>
-            <span className="title">{description}</span>
-            <span className="description timer">
-              <button type="button" aria-label="Play task" className={buttonPlayClass} onClick={this.onPlayClick} />
-              <button type="button" aria-label="Pause task" className={buttonPauseClass} onClick={this.onPauseClick} />
-              <span className="timer-time">{this.getTime(timer)}</span>
-            </span>
-            <span className="description">created {this.getTimeDistance(createdTime)}</span>
-          </label>
-          <button type="button" aria-label="Edit task" className={buttonEditClass} onClick={this.onButtonEditClick} />
-          <button type="button" aria-label="Delete task" className="icon icon-destroy" onClick={onDeleted} />
-        </div>
-        <TaskEditingForm task={description} id={id} onEdit={onEdit} onEditSubmit={this.onEditSubmit} />
-      </li>
-    );
-  }
-}
+Task.propTypes = {
+  description: PropTypes.string,
+  createdTime: PropTypes.instanceOf(Date),
+  onDeleted: PropTypes.func,
+  onToggleCompleted: PropTypes.func,
+  completed: PropTypes.bool,
+  id: PropTypes.string.isRequired,
+  onEdit: PropTypes.func,
+  timer: PropTypes.number,
+};
