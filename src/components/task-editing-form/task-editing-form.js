@@ -1,51 +1,41 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-export default class TaskEditingForm extends Component {
-  state = {
-    // eslint-disable-next-line react/destructuring-assignment
-    task: this.props.task,
-  };
+const TaskEditingForm = ({ onEdit, onEditSubmit, id, task }) => {
+  const [taskDescription, setTask] = useState(task);
 
-  static defaultProps = {
-    onEdit: () => {},
-    onEditSubmit: () => {},
-    task: 'Ops',
-  };
-
-  static propTypes = {
-    onEdit: PropTypes.func,
-    onEditSubmit: PropTypes.func,
-    id: PropTypes.string.isRequired,
-    task: PropTypes.string,
-  };
-
-  onFieldChange = (event) => {
+  const onFieldChange = (event) => {
     const newTask = event.target.value;
-
-    this.setState({
-      task: newTask.charAt(0).toUpperCase() + newTask.slice(1),
-    });
+    setTask(newTask.charAt(0).toUpperCase() + newTask.slice(1));
+    event.preventDefault();
   };
 
-  onSubmitEditing = (event) => {
-    event.preventDefault();
-
-    const { onEdit, onEditSubmit, id } = this.props;
-    const { task } = this.state;
-
+  const onSubmitEditing = (event) => {
     if (task.trim().length > 0) {
-      onEdit('description', task, id);
+      onEdit('description', taskDescription, id);
     }
     onEditSubmit();
+    event.preventDefault();
   };
 
-  render() {
-    const { task } = this.state;
-    return (
-      <form onSubmit={this.onSubmitEditing}>
-        <input type="text" className="edit" value={task} onChange={this.onFieldChange} />
-      </form>
-    );
-  }
-}
+  return (
+    <form onSubmit={onSubmitEditing}>
+      <input type="text" className="edit" value={taskDescription} onChange={onFieldChange} />
+    </form>
+  );
+};
+
+export default TaskEditingForm;
+
+TaskEditingForm.defaultProps = {
+  onEdit: () => {},
+  onEditSubmit: () => {},
+  task: 'Ops',
+};
+
+TaskEditingForm.propTypes = {
+  onEdit: PropTypes.func,
+  onEditSubmit: PropTypes.func,
+  id: PropTypes.string.isRequired,
+  task: PropTypes.string,
+};

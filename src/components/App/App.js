@@ -1,88 +1,12 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { nanoid } from 'nanoid';
 import Header from '../header/header';
 import TaskList from '../task-list/task-list';
 import Footer from '../footer/footer';
 import './App.css';
 
-export default class App extends Component {
-  state = {
-    data: [
-      this.createTask('Completed task', 60),
-      this.createTask('Editing task', 60),
-      this.createTask('Active task', 60),
-    ],
-    filter: 'All',
-  };
-
-  deleteTask = (id) => {
-    this.setState(({ data }) => {
-      const i = data.findIndex((el) => el.id === id);
-
-      const newData = [...data.slice(0, i), ...data.slice(i + 1)];
-
-      return {
-        data: newData,
-      };
-    });
-  };
-
-  addTask = (task, timer) => {
-    const newTask = this.createTask(task, timer);
-
-    this.setState(({ data }) => {
-      const newData = [...data, newTask];
-
-      return {
-        data: newData,
-      };
-    });
-  };
-
-  editTask = (key, value, id) => {
-    this.setState(({ data }) => {
-      const i = data.findIndex((el) => el.id === id);
-
-      const oldTask = data[i];
-      const edittingTask = { ...oldTask, [key]: value };
-
-      const newData = [...data.slice(0, i), edittingTask, ...data.slice(i + 1)];
-
-      return {
-        data: newData,
-      };
-    });
-  };
-
-  onToggleCompleted = (id) => {
-    this.setState(({ data }) => {
-      const i = data.findIndex((el) => el.id === id);
-
-      const oldTask = data[i];
-      const newTask = { ...oldTask, completed: !oldTask.completed };
-
-      const newData = [...data.slice(0, i), newTask, ...data.slice(i + 1)];
-
-      return {
-        data: newData,
-      };
-    });
-  };
-
-  clearCompleted = () => {
-    this.setState(({ data }) => {
-      const newData = data.filter((el) => !el.completed);
-      return {
-        data: newData,
-      };
-    });
-  };
-
-  onFilterChange = (filter) => {
-    this.setState({ filter });
-  };
-
-  createTask(description, timer) {
+const App = () => {
+  function createTask(description, timer) {
     return {
       description,
       createdTime: new Date(),
@@ -92,8 +16,53 @@ export default class App extends Component {
     };
   }
 
-  filter(tasks, filter) {
-    switch (filter) {
+  const [data, setData] = useState([
+    createTask('Completed task', 60),
+    createTask('Editing task', 60),
+    createTask('Active task', 60),
+  ]);
+  const [filter, setFilter] = useState('All');
+
+  const addTask = (task, timer) => {
+    const newTask = createTask(task, timer);
+    setData((oldData) => [...oldData, newTask]);
+  };
+
+  const editTask = (key, value, id) => {
+    setData((oldData) => {
+      const i = oldData.findIndex((el) => el.id === id);
+      const oldTask = oldData[i];
+
+      return [...oldData.slice(0, i), { ...oldTask, [key]: value }, ...oldData.slice(i + 1)];
+    });
+  };
+
+  const deleteTask = (id) => {
+    setData((oldData) => {
+      const i = oldData.findIndex((el) => el.id === id);
+      return [...oldData.slice(0, i), ...oldData.slice(i + 1)];
+    });
+  };
+
+  const onToggleCompleted = (id) => {
+    setData((oldData) => {
+      const i = oldData.findIndex((el) => el.id === id);
+      const oldTask = oldData[i];
+
+      return [...oldData.slice(0, i), { ...oldTask, completed: !oldTask.completed }, ...oldData.slice(i + 1)];
+    });
+  };
+
+  const clearCompleted = () => {
+    setData((oldData) => oldData.filter((el) => !el.completed));
+  };
+
+  const onFilterChange = (newFilter) => {
+    setFilter(newFilter);
+  };
+
+  function filterSwitch(tasks, filterValue) {
+    switch (filterValue) {
       case 'All':
         return tasks;
       case 'Active':
@@ -105,31 +74,19 @@ export default class App extends Component {
     }
   }
 
-  render() {
-    const { data, filter } = this.state;
+  const visibleTasks = filterSwitch(data, filter);
 
-    const visibleTasks = this.filter(data, filter);
+  const leftTaskCount = data.filter((el) => !el.completed).length;
 
-    const leftTaskCount = data.filter((el) => !el.completed).length;
-
-    return (
-      <section className="todoapp">
-        <Header onAdded={this.addTask} />
-        <section className="main">
-          <TaskList
-            todos={visibleTasks}
-            onDeleted={this.deleteTask}
-            onToggleCompleted={this.onToggleCompleted}
-            onEdit={this.editTask}
-          />
-          <Footer
-            leftTask={leftTaskCount}
-            onClear={this.clearCompleted}
-            filter={filter}
-            onFilterChange={this.onFilterChange}
-          />
-        </section>
+  return (
+    <section className="todoapp">
+      <Header onAdded={addTask} />
+      <section className="main">
+        <TaskList todos={visibleTasks} onDeleted={deleteTask} onToggleCompleted={onToggleCompleted} onEdit={editTask} />
+        <Footer leftTask={leftTaskCount} onClear={clearCompleted} filter={filter} onFilterChange={onFilterChange} />
       </section>
-    );
-  }
-}
+    </section>
+  );
+};
+
+export default App;

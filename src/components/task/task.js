@@ -15,11 +15,8 @@ const Task = ({ description, createdTime, onDeleted, onToggleCompleted, complete
   useEffect(() => {
     let timerId = null;
 
-    if (isPlaying) {
+    if (isPlaying && time > 0) {
       timerId = setInterval(() => {
-        if (time === 1) {
-          setPlayPause(false);
-        }
         setTime((oldTime) => oldTime - 1);
         onEdit('timer', time, id);
       }, 1000);
