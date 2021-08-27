@@ -17,7 +17,10 @@ const Task = ({ description, createdTime, onDeleted, onToggleCompleted, complete
 
     if (isPlaying) {
       timerId = setInterval(() => {
-        setTime((oldTime) => oldTime + 1);
+        if (time === 1) {
+          setPlayPause(false);
+        }
+        setTime((oldTime) => oldTime - 1);
         onEdit('timer', time, id);
       }, 1000);
     }
@@ -54,7 +57,6 @@ const Task = ({ description, createdTime, onDeleted, onToggleCompleted, complete
     const timeMs = new Date(currentTime * 1000);
     const seconds = <>{timeMs.getSeconds()}s</>;
     const minutes = <>{timeMs.getMinutes()}m</>;
-    const hours = <>{timeMs.getHours()}h</>;
     if (currentTime < 60) content = <>{seconds}</>;
     if (currentTime >= 60 && currentTime < 3600) {
       content =
@@ -63,18 +65,6 @@ const Task = ({ description, createdTime, onDeleted, onToggleCompleted, complete
         ) : (
           <>
             {minutes} {seconds}
-          </>
-        );
-    }
-    if (currentTime >= 3600 && currentTime < 86399) {
-      content =
-        currentTime >= 3600 && currentTime < 3659 ? (
-          <>
-            {hours} {seconds}
-          </>
-        ) : (
-          <>
-            {hours} {minutes} {seconds}
           </>
         );
     }
