@@ -57,7 +57,6 @@ export default class Task extends Component {
     const time = new Date(timer * 1000);
     const seconds = <>{time.getSeconds()}s</>;
     const minutes = <>{time.getMinutes()}m</>;
-    const hours = <>{time.getHours()}h</>;
     if (timer < 60) content = <>{seconds}</>;
     if (timer >= 60 && timer < 3600) {
       content =
@@ -66,18 +65,6 @@ export default class Task extends Component {
         ) : (
           <>
             {minutes} {seconds}
-          </>
-        );
-    }
-    if (timer >= 3600 && timer < 86399) {
-      content =
-        timer >= 3600 && timer < 3659 ? (
-          <>
-            {hours} {seconds}
-          </>
-        ) : (
-          <>
-            {hours} {minutes} {seconds}
           </>
         );
     }
@@ -95,7 +82,10 @@ export default class Task extends Component {
     if (!this.state.timerId) {
       const timerId = setInterval(() => {
         const oldTimer = this.state.timer;
-        const newTimer = oldTimer + 1;
+        const newTimer = oldTimer - 1;
+        if (newTimer === 0) {
+          clearInterval(timerId);
+        }
         this.setState({ timer: newTimer });
         onEdit('timer', newTimer, id);
       }, 1000);

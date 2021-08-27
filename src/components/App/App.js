@@ -7,7 +7,11 @@ import './App.css';
 
 export default class App extends Component {
   state = {
-    data: [this.createTask('Completed task'), this.createTask('Editing task'), this.createTask('Active task')],
+    data: [
+      this.createTask('Completed task', 60),
+      this.createTask('Editing task', 60),
+      this.createTask('Active task', 60),
+    ],
     filter: 'All',
   };
 
@@ -23,8 +27,8 @@ export default class App extends Component {
     });
   };
 
-  addTask = (task) => {
-    const newTask = this.createTask(task);
+  addTask = (task, timer) => {
+    const newTask = this.createTask(task, timer);
 
     this.setState(({ data }) => {
       const newData = [...data, newTask];
@@ -78,13 +82,13 @@ export default class App extends Component {
     this.setState({ filter });
   };
 
-  createTask(task) {
+  createTask(description, timer) {
     return {
-      description: task,
+      description,
       createdTime: new Date(),
       completed: false,
       id: nanoid(3),
-      timer: 0,
+      timer,
     };
   }
 
