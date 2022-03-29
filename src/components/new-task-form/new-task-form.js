@@ -14,7 +14,7 @@ const TaskForm = ({ onAdded }) => {
   };
 
   const onMinutesSet = (event) => {
-    setSeconds(Number(event.target.value));
+    setMinutes(Number(event.target.value));
     event.preventDefault();
   };
 
